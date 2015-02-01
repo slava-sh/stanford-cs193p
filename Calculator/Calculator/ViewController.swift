@@ -29,28 +29,57 @@ class ViewController: UIViewController {
             }
         }
     }
+
+    func editSignAbsoluteValue(block: (String, String) -> String) {
+        let (sign, text) = display.text!.hasPrefix("-") ? ("-", dropFirst(display.text!)) : ("", display.text!)
+        display.text = block(sign, text)
+    }
+    
+    func editAbsoluteValue(block: String -> String) {
+        editSignAbsoluteValue({ sign, text in sign + block(text) })
+    }
+    
+    func startEditing() {
+        display.text = "0"
+        userIsInTheMiddleOfTypingANumber = true
+    }
     
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         println("digit = \(digit)")
         if !userIsInTheMiddleOfTypingANumber {
-            displayValue = nil
-            userIsInTheMiddleOfTypingANumber = true
+            startEditing()
         }
-        if display.text! == "0" && digit != "." {
-            display.text = digit
+        editAbsoluteValue { text in
+            var newText: String
+            if text == "0" && digit != "." {
+                newText = digit
+            }
+            else if digit != "." || text.rangeOfString(".") == nil {
+                newText = text + digit
+            }
+            else {
+                newText = text
+            }
+            return newText
         }
-        else if digit != "." || display.text!.rangeOfString(".") == nil {
-            display.text = display.text! + digit
+    }
+    
+    @IBAction func changeSign() {
+        if userIsInTheMiddleOfTypingANumber {
+            display.text = display.text!.hasPrefix("-") ? dropFirst(display.text!) : "-" + display.text!;
+        }
+        else {
+            performOperation { -$0 }
         }
     }
     
     @IBAction func eraseLastDigit() {
         if userIsInTheMiddleOfTypingANumber {
-            display.text = countElements(display.text!) == 1 ? "0" : dropLast(display.text!)
+            editAbsoluteValue { text in countElements(text) == 1 ? "0" : dropLast(text) }
         }
         else {
-            displayValue = nil
+            startEditing()
         }
     }
 
@@ -61,7 +90,7 @@ class ViewController: UIViewController {
             operandStack.append(value)
             println("operandStack = \(operandStack)")
         }
-        displayValue = nil
+        userIsInTheMiddleOfTypingANumber = false
     }
     
     @IBAction func operate(sender: UIButton) {

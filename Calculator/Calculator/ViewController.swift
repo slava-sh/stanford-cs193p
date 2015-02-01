@@ -11,105 +11,75 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var stack: UILabel!
-    @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var input: UILabel!
     
     var brain = CalculatorBrain()
-    
     var userIsInTheMiddleOfTypingANumber = false
     
-    var displayValue: Double? {
+    var inputValue: Double? {
         get {
-            return NSNumberFormatter().numberFromString(display.text!)?.doubleValue
+            return NSNumberFormatter().numberFromString(input.text!)?.doubleValue
         }
-        
-        set(optionalNewValue) {
-            userIsInTheMiddleOfTypingANumber = false
-            if let newValue = optionalNewValue {
-                display.text = "\(newValue)"
-//                display.text = "= \(newValue)"
-            }
-            else {
-                display.text = "0"
-            }
-        }
-    }
-
-    func editSignAbsoluteValue(block: (String, String) -> String) {
-        let (sign, text) = display.text!.hasPrefix("-") ? ("-", dropFirst(display.text!)) : ("", display.text!)
-        display.text = block(sign, text)
-    }
-    
-    func editAbsoluteValue(block: String -> String) {
-        editSignAbsoluteValue({ sign, text in sign + block(text) })
     }
     
     func startEditing() {
-        display.text = "0"
         userIsInTheMiddleOfTypingANumber = true
+        input.text = "0"
     }
-    
+
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         if !userIsInTheMiddleOfTypingANumber {
             startEditing()
         }
-        editAbsoluteValue { text in
-            var newText: String
-            if text == "0" && digit != "." {
-                newText = digit
-            }
-            else if digit != "." || text.rangeOfString(".") == nil {
-                newText = text + digit
-            }
-            else {
-                newText = text
-            }
-            return newText
+        if input.text! == "0" && digit != "." {
+            input.text = digit
+        }
+        else if digit != "." || input.text!.rangeOfString(".") == nil {
+            input.text = input.text! + digit
         }
     }
-    
-    @IBAction func changeSign() {
-        if userIsInTheMiddleOfTypingANumber {
-            display.text = display.text!.hasPrefix("-") ? dropFirst(display.text!) : "-" + display.text!;
-        }
-        else {
-//            performOperation { -$0 }
-        }
-    }
-    
+
     @IBAction func eraseLastDigit() {
-        if userIsInTheMiddleOfTypingANumber {
-            editAbsoluteValue { text in countElements(text) == 1 ? "0" : dropLast(text) }
-        }
-        else {
+        if !userIsInTheMiddleOfTypingANumber {
             startEditing()
         }
+        input.text = countElements(input.text!) == 1 ? "0" : dropLast(input.text!)
     }
     
     @IBAction func enter() {
-        if let value = displayValue {
-            brain.pushOperand(value)
-            renderBrain()
-        }
         userIsInTheMiddleOfTypingANumber = false
+        if let value = inputValue {
+            brain.pushOperand(value)
+        }
+        else {
+            brain.pushOperand(input.text!)
+        }
+        renderBrain()
+    }
+    
+    @IBAction func insertVariable(sender: UIButton) {
+        input.text = sender.currentTitle!
+        enter()
     }
     
     @IBAction func operate(sender: UIButton) {
         if userIsInTheMiddleOfTypingANumber {
             enter()
         }
-        let operation = sender.currentTitle!
-        brain.pushOperation(operation)
+        brain.pushOperation(sender.currentTitle!)
         renderBrain()
     }
     
     @IBAction func reset() {
         brain = CalculatorBrain()
+        userIsInTheMiddleOfTypingANumber = false
+        input.text = "0"
         renderBrain()
     }
     
     func renderBrain() {
-        stack.text = "\(brain)"
-        displayValue = brain.evaluate()
+        let result = brain.evaluate()
+        stack.text = "\(brain) = \(result)"
     }
 }

@@ -11,14 +11,16 @@ import Foundation
 class CalculatorBrain: Printable {
     
     private enum Op: Printable {
-        case Operand(Double)
+        case Constant(Double)
+        case Variable(String, Double)
         case UnaryOp(String, Double -> Double)
         case BinaryOp(String, (Double, Double) -> Double)
         
         var description: String {
             get {
                 switch self {
-                case .Operand(let x): return "\(x)"
+                case .Constant(let x): return "\(x)"
+                case .Variable(let x, _): return "\(x)"
                 case .UnaryOp(let op, _): return op
                 case .BinaryOp(let op, _): return op
                 }
@@ -40,6 +42,7 @@ class CalculatorBrain: Printable {
         learnOp(Op.UnaryOp("√" ,sqrt))
         learnOp(Op.UnaryOp("sin", sin))
         learnOp(Op.UnaryOp("cos", cos))
+        learnOp(Op.Variable("π", M_PI))
     }
     
     var description: String {
@@ -49,7 +52,13 @@ class CalculatorBrain: Printable {
     }
     
     func pushOperand(operand: Double) {
-        opStack.append(Op.Operand(operand))
+        opStack.append(Op.Constant(operand))
+        println("opStack = \(opStack)")
+    }
+    
+    func pushOperand(operand: String) {
+        opStack.append(knownOps[operand]!)
+        println("opStack = \(opStack)")
     }
     
     func pushOperation(operation: String) {
@@ -68,7 +77,9 @@ class CalculatorBrain: Printable {
             var remainingOps = ops
             let op = remainingOps.removeLast()
             switch op {
-            case .Operand(let operand):
+            case .Constant(let operand):
+                return (operand, remainingOps)
+            case .Variable(_, let operand):
                 return (operand, remainingOps)
             case .UnaryOp(_, let operation):
                 let opEvaluation = evaluate(remainingOps)

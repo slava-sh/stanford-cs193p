@@ -12,6 +12,8 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
     
+    var brain = CalculatorBrain()
+    
     var userIsInTheMiddleOfTypingANumber = false
     
     var displayValue: Double? {
@@ -22,7 +24,8 @@ class ViewController: UIViewController {
         set(optionalNewValue) {
             userIsInTheMiddleOfTypingANumber = false
             if let newValue = optionalNewValue {
-                display.text = "= \(newValue)"
+                display.text = "\(newValue)"
+//                display.text = "= \(newValue)"
             }
             else {
                 display.text = "0"
@@ -46,7 +49,6 @@ class ViewController: UIViewController {
     
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
-        println("digit = \(digit)")
         if !userIsInTheMiddleOfTypingANumber {
             startEditing()
         }
@@ -70,7 +72,7 @@ class ViewController: UIViewController {
             display.text = display.text!.hasPrefix("-") ? dropFirst(display.text!) : "-" + display.text!;
         }
         else {
-            performOperation { -$0 }
+//            performOperation { -$0 }
         }
     }
     
@@ -83,12 +85,10 @@ class ViewController: UIViewController {
         }
     }
 
-    var operandStack = [Double]()
-
     @IBAction func enter() {
         if let value = displayValue {
-            operandStack.append(value)
-            println("operandStack = \(operandStack)")
+            brain.pushOperand(value)
+            displayValue = brain.evaluate()
         }
         userIsInTheMiddleOfTypingANumber = false
     }
@@ -98,46 +98,12 @@ class ViewController: UIViewController {
             enter()
         }
         let operation = sender.currentTitle!
-        switch operation {
-        case "+": performOperation { $0 + $1 }
-        case "−": performOperation { $0 - $1 }
-        case "×": performOperation { $0 * $1 }
-        case "÷": performOperation { $0 / $1 }
-        case "π": performOperation { M_PI }
-        case "√": performOperation { sqrt($0) }  // TODO: handle the negative case
-        case "sin": performOperation { sin($0) }
-        case "cos": performOperation { cos($0) }
-        default: break
-        }
-    }
-    
-    func performOperation(operation: (Double, Double) -> Double) {
-        if operandStack.count >= 2 {
-            let arg2 = operandStack.removeLast()
-            let arg1 = operandStack.removeLast()
-            setResult(operation(arg1, arg2))
-        }
-    }
-    
-    func performOperation(operation: Double -> Double) {
-        if operandStack.count >= 1 {
-            setResult(operation(operandStack.removeLast()))
-        }
-    }
-
-    func performOperation(operation: () -> Double) {
-        setResult(operation())
-    }
-    
-    func setResult(result: Double) {
-        operandStack.append(result)
-        println("operandStack = \(operandStack)")
-        displayValue = result
+        brain.pushOperation(operation)
+        displayValue = brain.evaluate()
     }
     
     @IBAction func reset() {
-        operandStack.removeAll()
-        println("operandStack = \(operandStack)")
-        displayValue = nil
+        brain = CalculatorBrain()
+        display.text = "0"
     }
 }

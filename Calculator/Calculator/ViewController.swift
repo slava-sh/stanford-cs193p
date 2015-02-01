@@ -12,9 +12,15 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var stack: UILabel!
     @IBOutlet weak var input: UILabel!
-    
-    var brain = CalculatorBrain()
     var userIsInTheMiddleOfTypingANumber = false
+    var brain = CalculatorBrain()
+    
+    @IBAction func reset() {
+        stack.text = " "
+        input.text = "0"
+        userIsInTheMiddleOfTypingANumber = false
+        brain = CalculatorBrain()
+    }
     
     var inputValue: Double? {
         get {
@@ -22,16 +28,16 @@ class ViewController: UIViewController {
         }
     }
     
-    func startEditing() {
-        userIsInTheMiddleOfTypingANumber = true
-        input.text = "0"
+    func willType() {
+        if !userIsInTheMiddleOfTypingANumber {
+            userIsInTheMiddleOfTypingANumber = true
+            input.text = "0"
+        }
     }
 
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
-        if !userIsInTheMiddleOfTypingANumber {
-            startEditing()
-        }
+        willType()
         if input.text! == "0" && digit != "." {
             input.text = digit
         }
@@ -41,9 +47,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func eraseLastDigit() {
-        if !userIsInTheMiddleOfTypingANumber {
-            startEditing()
-        }
+        willType()
         input.text = countElements(input.text!) == 1 ? "0" : dropLast(input.text!)
     }
     
@@ -68,13 +72,6 @@ class ViewController: UIViewController {
             enter()
         }
         brain.pushOperation(sender.currentTitle!)
-        renderBrain()
-    }
-    
-    @IBAction func reset() {
-        brain = CalculatorBrain()
-        userIsInTheMiddleOfTypingANumber = false
-        input.text = "0"
         renderBrain()
     }
     

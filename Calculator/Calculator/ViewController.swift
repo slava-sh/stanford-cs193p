@@ -20,7 +20,7 @@ class ViewController: UIViewController {
         }
         
         set {
-            display.text = "\(newValue)"
+            display.text = NSNumberFormatter().stringFromNumber(newValue)!
             userIsInTheMiddleOfTypingANumber = false
         }
     }

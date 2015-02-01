@@ -50,6 +50,9 @@ class ViewController: UIViewController {
         case "−": performOperation { $0 - $1 }
         case "×": performOperation { $0 * $1 }
         case "÷": performOperation { $0 / $1 }
+        case "√": performOperation { sqrt($0) }  // TODO: handle the negative case
+        case "sin": performOperation { sin($0) }
+        case "cos": performOperation { cos($0) }
         default: break
         }
     }
@@ -59,6 +62,13 @@ class ViewController: UIViewController {
             let arg2 = operandStack.removeLast()
             let arg1 = operandStack.removeLast()
             displayValue = operation(arg1, arg2)
+            enter()
+        }
+    }
+    
+    func performOperation(operation: Double -> Double) {
+        if operandStack.count >= 1 {
+            displayValue = operation(operandStack.removeLast())
             enter()
         }
     }

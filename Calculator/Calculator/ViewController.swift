@@ -28,15 +28,20 @@ class ViewController: UIViewController {
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         println("digit = \(digit)")
-        if userIsInTheMiddleOfTypingANumber {
-            if digit != "." || display.text!.rangeOfString(".") == nil {
-                display.text = display.text! + digit
-            }
+        if !userIsInTheMiddleOfTypingANumber {
+            userIsInTheMiddleOfTypingANumber = true
+            display.text = "0"
         }
-        else {
-            display.text = digit == "." ? "0." : digit
-            userIsInTheMiddleOfTypingANumber = display.text != "0"
+        if display.text! == "0" && digit != "." {
+            display.text = digit
         }
+        else if digit != "." || display.text!.rangeOfString(".") == nil {
+            display.text = display.text! + digit
+        }
+    }
+    
+    @IBAction func eraseLastDigit() {
+        display.text = countElements(display.text!) == 1 ? "0" : dropLast(display.text!)
     }
 
     var operandStack = [Double]()

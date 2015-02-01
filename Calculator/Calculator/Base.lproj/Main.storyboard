@@ -178,9 +178,12 @@
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bte-Ia-EYK">
                                 <rect key="frame" x="491" y="200" width="85" height="126"/>
-                                <state key="normal">
+                                <state key="normal" title="⌫">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="eraseLastDigit" destination="BYZ-38-t0r" eventType="touchUpInside" id="VcG-bx-rB6"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wuX-Da-rw6">
                                 <rect key="frame" x="491" y="334" width="85" height="125"/>

@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         }
         else {
             display.text = digit == "." ? "0." : digit
-            userIsInTheMiddleOfTypingANumber = true
+            userIsInTheMiddleOfTypingANumber = display.text != "0"
         }
     }
 

@@ -79,7 +79,14 @@ class ViewController: UIViewController {
     }
     
     func renderBrain() {
+        assert(!userIsInTheMiddleOfTypingANumber, "Rendering brain while typing")
         let result = brain.evaluate()
-        stack.text = "\(brain) = \(result)"
+        stack.text = "\(brain)"
+        if let value = result {
+            input.text = "= \(value)"
+        }
+        else {
+            input.text = "= nil"
+        }
     }
 }

@@ -47,7 +47,7 @@ class CalculatorBrain: Printable {
     
     var description: String {
         get {
-            return "\(opStack)";
+            return " ".join(opStack.map({ $0.description }))
         }
     }
     

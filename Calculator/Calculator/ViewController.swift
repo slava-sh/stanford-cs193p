@@ -25,8 +25,6 @@ class ViewController: UIViewController {
         }
     }
     
-    var operandStack = [Double]()
-    
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         println("digit = \(digit)")
@@ -40,7 +38,9 @@ class ViewController: UIViewController {
             userIsInTheMiddleOfTypingANumber = true
         }
     }
-    
+
+    var operandStack = [Double]()
+
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
         operandStack.append(displayValue)
@@ -84,5 +84,11 @@ class ViewController: UIViewController {
     func performOperation(operation: () -> Double) {
         displayValue = operation()
         enter()
+    }
+    
+    @IBAction func reset() {
+        operandStack.removeAll()
+        displayValue = 0
+        println("operandStack = \(operandStack)")
     }
 }

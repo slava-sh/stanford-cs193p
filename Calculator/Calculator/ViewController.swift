@@ -14,14 +14,19 @@ class ViewController: UIViewController {
     
     var userIsInTheMiddleOfTypingANumber = false
     
-    var displayValue: Double {
+    var displayValue: Double? {
         get {
-            return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
+            return NSNumberFormatter().numberFromString(display.text!)?.doubleValue
         }
         
-        set {
-            display.text = NSNumberFormatter().stringFromNumber(newValue)!
+        set(optionalNewValue) {
             userIsInTheMiddleOfTypingANumber = false
+            if let newValue = optionalNewValue {
+                display.text = "\(newValue)"
+            }
+            else {
+                display.text = "0"
+            }
         }
     }
     
@@ -48,7 +53,12 @@ class ViewController: UIViewController {
 
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
-        operandStack.append(displayValue)
+        if let value = displayValue {
+            operandStack.append(value)
+        }
+        else {
+            displayValue = nil
+        }
         println("operandStack = \(operandStack)")
     }
     
@@ -68,6 +78,7 @@ class ViewController: UIViewController {
         case "cos": performOperation { cos($0) }
         default: break
         }
+        display.text = "= " + display.text!
     }
     
     func performOperation(operation: (Double, Double) -> Double) {
@@ -93,7 +104,7 @@ class ViewController: UIViewController {
     
     @IBAction func reset() {
         operandStack.removeAll()
-        displayValue = 0
+        displayValue = nil
         println("operandStack = \(operandStack)")
     }
 }

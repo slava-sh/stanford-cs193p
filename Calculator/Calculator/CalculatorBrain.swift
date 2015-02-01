@@ -69,7 +69,7 @@ class CalculatorBrain: Printable {
     func evaluate() -> Double? {
         let (result, remainder) = evaluate(opStack)
         println("\(opStack) = \(result) with \(remainder) left")
-        return result
+        return remainder.isEmpty ? result : nil
     }
     
     private func evaluate(ops: [Op]) -> (result: Double?, remainingOps: [Op]) {

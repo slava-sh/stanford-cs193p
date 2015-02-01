@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         set(optionalNewValue) {
             userIsInTheMiddleOfTypingANumber = false
             if let newValue = optionalNewValue {
-                display.text = "\(newValue)"
+                display.text = "= \(newValue)"
             }
             else {
                 display.text = "0"
@@ -34,8 +34,8 @@ class ViewController: UIViewController {
         let digit = sender.currentTitle!
         println("digit = \(digit)")
         if !userIsInTheMiddleOfTypingANumber {
+            displayValue = nil
             userIsInTheMiddleOfTypingANumber = true
-            display.text = "0"
         }
         if display.text! == "0" && digit != "." {
             display.text = digit
@@ -46,20 +46,22 @@ class ViewController: UIViewController {
     }
     
     @IBAction func eraseLastDigit() {
-        display.text = countElements(display.text!) == 1 ? "0" : dropLast(display.text!)
+        if userIsInTheMiddleOfTypingANumber {
+            display.text = countElements(display.text!) == 1 ? "0" : dropLast(display.text!)
+        }
+        else {
+            displayValue = nil
+        }
     }
 
     var operandStack = [Double]()
 
     @IBAction func enter() {
-        userIsInTheMiddleOfTypingANumber = false
         if let value = displayValue {
             operandStack.append(value)
+            println("operandStack = \(operandStack)")
         }
-        else {
-            displayValue = nil
-        }
-        println("operandStack = \(operandStack)")
+        displayValue = nil
     }
     
     @IBAction func operate(sender: UIButton) {
@@ -78,33 +80,35 @@ class ViewController: UIViewController {
         case "cos": performOperation { cos($0) }
         default: break
         }
-        display.text = "= " + display.text!
     }
     
     func performOperation(operation: (Double, Double) -> Double) {
         if operandStack.count >= 2 {
             let arg2 = operandStack.removeLast()
             let arg1 = operandStack.removeLast()
-            displayValue = operation(arg1, arg2)
-            enter()
+            setResult(operation(arg1, arg2))
         }
     }
     
     func performOperation(operation: Double -> Double) {
         if operandStack.count >= 1 {
-            displayValue = operation(operandStack.removeLast())
-            enter()
+            setResult(operation(operandStack.removeLast()))
         }
     }
 
     func performOperation(operation: () -> Double) {
-        displayValue = operation()
-        enter()
+        setResult(operation())
+    }
+    
+    func setResult(result: Double) {
+        operandStack.append(result)
+        println("operandStack = \(operandStack)")
+        displayValue = result
     }
     
     @IBAction func reset() {
         operandStack.removeAll()
-        displayValue = nil
         println("operandStack = \(operandStack)")
+        displayValue = nil
     }
 }

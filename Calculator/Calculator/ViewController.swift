@@ -30,8 +30,15 @@ class ViewController: UIViewController {
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         println("digit = \(digit)")
-        display.text = userIsInTheMiddleOfTypingANumber ? display.text! + digit : digit
-        userIsInTheMiddleOfTypingANumber = true
+        if userIsInTheMiddleOfTypingANumber {
+            if digit != "." || display.text!.rangeOfString(".") == nil {
+                display.text = display.text! + digit
+            }
+        }
+        else {
+            display.text = digit == "." ? "0." : digit
+            userIsInTheMiddleOfTypingANumber = true
+        }
     }
     
     @IBAction func enter() {
@@ -50,6 +57,7 @@ class ViewController: UIViewController {
         case "−": performOperation { $0 - $1 }
         case "×": performOperation { $0 * $1 }
         case "÷": performOperation { $0 / $1 }
+        case "π": performOperation { M_PI }
         case "√": performOperation { sqrt($0) }  // TODO: handle the negative case
         case "sin": performOperation { sin($0) }
         case "cos": performOperation { cos($0) }
@@ -71,5 +79,10 @@ class ViewController: UIViewController {
             displayValue = operation(operandStack.removeLast())
             enter()
         }
+    }
+
+    func performOperation(operation: () -> Double) {
+        displayValue = operation()
+        enter()
     }
 }

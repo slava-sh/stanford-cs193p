@@ -8,7 +8,7 @@
 
 import Foundation
 
-class CalculatorBrain {
+class CalculatorBrain: Printable {
     
     private enum Op: Printable {
         case Operand(Double)
@@ -40,6 +40,12 @@ class CalculatorBrain {
         learnOp(Op.UnaryOp("√" ,sqrt))
         learnOp(Op.UnaryOp("sin", sin))
         learnOp(Op.UnaryOp("cos", cos))
+    }
+    
+    var description: String {
+        get {
+            return "\(opStack)";
+        }
     }
     
     func pushOperand(operand: Double) {

@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var stack: UILabel!
     @IBOutlet weak var display: UILabel!
     
     var brain = CalculatorBrain()
@@ -84,11 +85,11 @@ class ViewController: UIViewController {
             startEditing()
         }
     }
-
+    
     @IBAction func enter() {
         if let value = displayValue {
             brain.pushOperand(value)
-            displayValue = brain.evaluate()
+            renderBrain()
         }
         userIsInTheMiddleOfTypingANumber = false
     }
@@ -99,11 +100,16 @@ class ViewController: UIViewController {
         }
         let operation = sender.currentTitle!
         brain.pushOperation(operation)
-        displayValue = brain.evaluate()
+        renderBrain()
     }
     
     @IBAction func reset() {
         brain = CalculatorBrain()
-        display.text = "0"
+        renderBrain()
+    }
+    
+    func renderBrain() {
+        stack.text = "\(brain)"
+        displayValue = brain.evaluate()
     }
 }
